@@ -1,0 +1,7 @@
+services:
+  gotify:
+    image: gotify/server
+    ports:
+      - 8080:80
+    volumes:
+      - ./test-server:/app/data

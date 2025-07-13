@@ -1,0 +1,36 @@
+name: Prerelease Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Build All Versions
+      run: make build
+
+    - name: Determine Version Number and Change Log
+      id: version
+      run: |
+        VERSION_DATE=$(shell date +%Y.%m.%d)
+        echo "TAG_NAME=$VERSION_DATE-pre" >> $GITHUB_OUTPUT
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.TAG_NAME }}
+        name: Prerelease - ${{ steps.version.outputs.TAG_NAME }}
+        body_path: PRE_CHANGELOG.md
+        make_latest: false
+        prerelease: true
+        token: ${{ secrets.GIT_TOKEN }}
+        files: |
+          build/cekrss-linux-amd64.so
+          build/cekrss-linux-arm-7.so
+          build/cekrss-linux-arm64.so

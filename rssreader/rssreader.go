@@ -2,10 +2,13 @@ package rssreader
 
 import (
 	"log"
+	"time"
 
 	"github.com/CEKlopfenstein/gotify-repeater/gotify_api"
 	"github.com/CEKlopfenstein/gotify-repeater/storage"
 	"github.com/gorilla/websocket"
+	"github.com/gotify/plugin-api"
+	"github.com/mmcdole/gofeed"
 )
 
 type RSS_Reader struct {
@@ -42,4 +45,38 @@ func (rssreader *RSS_Reader) UpdateToken(token string) error {
 		return err
 	}
 	return nil
+}
+
+func (rssreader *RSS_Reader) CheckFeeds(msgHandler plugin.MessageHandler) {
+	var feeds = rssreader.storage.GetFeeds()
+	for id, feedRecord := range *feeds {
+		fp := gofeed.NewParser()
+		feed, _ := fp.ParseURL(feedRecord.Url)
+		var latest *time.Time = nil
+		var urls = []string{}
+		for itemIndex := len(feed.Items) - 1; itemIndex >= 0; itemIndex-- {
+			var item = feed.Items[itemIndex]
+			urls = append(urls, item.Link)
+
+			var timeOfPost = item.UpdatedParsed
+			if timeOfPost == nil {
+				timeOfPost = item.PublishedParsed
+			}
+
+			if timeOfPost != nil && (latest == nil || latest.Compare(*timeOfPost) < 0) {
+				latest = timeOfPost
+			}
+
+			if feedRecord.IsItemNew(item, &rssreader.storage) {
+				rssreader.sendRSSMessage(msgHandler, *item)
+			}
+		}
+
+		rssreader.storage.SaveITemUrlsAndLatestDate(id, urls, latest)
+	}
+
+}
+
+func (rssreader *RSS_Reader) sendRSSMessage(msgHandler plugin.MessageHandler, item gofeed.Item) error {
+	return msgHandler.SendMessage(plugin.Message{Title: item.Title + " " + item.Title, Message: item.Link})
 }

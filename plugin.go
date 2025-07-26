@@ -17,6 +17,7 @@ import (
 	"github.com/CEKlopfenstein/gotify-repeater/user_interface"
 	"github.com/gin-gonic/gin"
 	"github.com/gotify/plugin-api"
+	"github.com/robfig/cron"
 )
 
 var VERSION string
@@ -52,6 +53,7 @@ type GotifyRSSPlugin struct {
 	logger     *log.Logger
 	logBuffer  *bytes.Buffer
 	msgHandler plugin.MessageHandler
+	cronJobs   *cron.Cron
 }
 
 // Enable enables the plugin.
@@ -63,12 +65,19 @@ func (c *GotifyRSSPlugin) Enable() error {
 	c.rssreader.SetLogger(c.logger)
 	c.rssreader.SetStorage(c.storage)
 	c.logger.Printf("Plugin Enabled for %s\n", c.userCtx.Name)
+	c.rssreader.CheckFeeds(c.msgHandler)
+
+	c.cronJobs = cron.New()
+	c.cronJobs.AddFunc("5 * * * *", func() { c.rssreader.CheckFeeds(c.msgHandler) })
+	c.cronJobs.Start()
 	return nil
 }
 
 // Disable disables the plugin.
 func (c *GotifyRSSPlugin) Disable() error {
 	c.enabled = false
+	c.cronJobs.Stop()
+	c.cronJobs = nil
 	c.logger.Printf("Plugin Disabled for %s\n", c.userCtx.Name)
 	return nil
 }

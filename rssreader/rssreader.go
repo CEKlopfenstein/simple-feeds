@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/CEKlopfenstein/gotify-repeater/gotify_api"
-	"github.com/CEKlopfenstein/gotify-repeater/storage"
+	"github.com/CEKlopfenstein/simple-feeds/gotify_api"
+	"github.com/CEKlopfenstein/simple-feeds/storage"
 	"github.com/gorilla/websocket"
 	"github.com/gotify/plugin-api"
 	"github.com/mmcdole/gofeed"

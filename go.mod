@@ -1,4 +1,4 @@
-module github.com/CEKlopfenstein/gotify-repeater
+module github.com/CEKlopfenstein/simple-feeds
 
 go 1.23.0
 

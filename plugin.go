@@ -9,12 +9,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/CEKlopfenstein/gotify-repeater/config"
-	"github.com/CEKlopfenstein/gotify-repeater/gotify_api"
-	"github.com/CEKlopfenstein/gotify-repeater/rssreader"
-	"github.com/CEKlopfenstein/gotify-repeater/storage"
-	"github.com/CEKlopfenstein/gotify-repeater/structs"
-	"github.com/CEKlopfenstein/gotify-repeater/user_interface"
+	"github.com/CEKlopfenstein/simple-feeds/config"
+	"github.com/CEKlopfenstein/simple-feeds/gotify_api"
+	"github.com/CEKlopfenstein/simple-feeds/rssreader"
+	"github.com/CEKlopfenstein/simple-feeds/storage"
+	"github.com/CEKlopfenstein/simple-feeds/structs"
+	"github.com/CEKlopfenstein/simple-feeds/user_interface"
 	"github.com/gin-gonic/gin"
 	"github.com/gotify/plugin-api"
 	"github.com/robfig/cron"
@@ -26,11 +26,11 @@ var VERSION string
 var changesSinceLastFullRelease string
 
 var info = plugin.Info{
-	ModulePath:  "github.com/CEKlopfenstein/gotify-repeater",
+	ModulePath:  "github.com/CEKlopfenstein/simple-feeds",
 	Version:     "BLANK",
 	Author:      "CEKlopfenstein",
-	Description: "",
-	Name:        "Gotify RSS",
+	Description: "Simple Gotify Plugin that Periodically queries different feeds and publishes new feed items to the attached Gotify Server.",
+	Name:        "Simple Feeds",
 }
 
 // GetGotifyPluginInfo returns gotify plugin info.

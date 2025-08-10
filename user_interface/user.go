@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/CEKlopfenstein/gotify-repeater/gotify_api"
-	"github.com/CEKlopfenstein/gotify-repeater/rssreader"
-	"github.com/CEKlopfenstein/gotify-repeater/structs"
+	"github.com/CEKlopfenstein/simple-feeds/gotify_api"
+	"github.com/CEKlopfenstein/simple-feeds/rssreader"
+	"github.com/CEKlopfenstein/simple-feeds/structs"
 	"github.com/gin-gonic/gin"
 	"github.com/mmcdole/gofeed"
 )

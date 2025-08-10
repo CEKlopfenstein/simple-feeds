@@ -29,7 +29,7 @@ var info = plugin.Info{
 	ModulePath:  "github.com/CEKlopfenstein/simple-feeds",
 	Version:     "BLANK",
 	Author:      "CEKlopfenstein",
-	Description: "Simple Gotify Plugin that Periodically queries different feeds and publishes new feed items to the attached Gotify Server.",
+	Description: "Simple Gotify Plugin that periodically queries different feeds and publishes new feed items to the attached Gotify Server.",
 	Name:        "Simple Feeds",
 }
 
@@ -68,7 +68,7 @@ func (c *GotifyRSSPlugin) Enable() error {
 	c.rssreader.CheckFeeds(c.msgHandler)
 
 	c.cronJobs = cron.New()
-	c.cronJobs.AddFunc("5 * * * *", func() { c.rssreader.CheckFeeds(c.msgHandler) })
+	c.cronJobs.AddFunc("0 */5 * * * *", func() { c.rssreader.CheckFeeds(c.msgHandler) })
 	c.cronJobs.Start()
 	return nil
 }

@@ -1,6 +1,6 @@
 BUILDDIR=./build
 GOTIFY_VERSION=v2.6.3
-PLUGIN_NAME=cekrss
+PLUGIN_NAME=simple-feeds
 PLUGIN_ENTRY=plugin.go
 GO_VERSION=`cat $(BUILDDIR)/gotify-server-go-version`
 VERSION_DATE=$(shell date +%Y.%m.%d)

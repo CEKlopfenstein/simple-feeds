@@ -20,7 +20,7 @@ jobs:
     - name: Determine Version Number
       id: version
       run: |
-        VERSION_DATE=$(shell date +%Y.%m.%d)
+        VERSION_DATE=$(date +%Y.%m.%d)
         echo "TAG_NAME=$VERSION_DATE" >> $GITHUB_OUTPUT
     - name: Release
       uses: softprops/action-gh-release@v2
@@ -31,6 +31,6 @@ jobs:
         make_latest: true
         token: ${{ secrets.GIT_TOKEN }}
         files: |
-          build/cekrss-linux-amd64.so
-          build/cekrss-linux-arm-7.so
-          build/cekrss-linux-arm64.so
+          build/simple-feeds-linux-amd64.so
+          build/simple-feeds-linux-arm-7.so
+          build/simple-feeds-linux-arm64.so

@@ -103,7 +103,7 @@ func (c *GotifyRSSPlugin) GetDisplay(location *url.URL) string {
 
 func (c *GotifyRSSPlugin) RegisterWebhook(basePath string, mux *gin.RouterGroup) {
 	c.basePath = basePath
-	user_interface.BuildInterface(basePath, mux, &c.rssreader, c.config, c.storage, c.hostName, c.logger, c.logBuffer)
+	user_interface.BuildInterface(basePath, mux, &c.rssreader, c.config, c.hostName, c.logger, c.logBuffer)
 }
 
 func (c *GotifyRSSPlugin) SetStorageHandler(h plugin.StorageHandler) {

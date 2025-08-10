@@ -28,6 +28,10 @@ type Feed struct {
 	ItemUrls map[string]bool
 }
 
+func (feed *Feed) GetID() int {
+	return feed.id
+}
+
 // Saves the current inner storage struct. Should be called after every save/set
 func (storage *Storage) save() {
 	storageBytes, _ := json.Marshal(storage.innerStore)
@@ -56,6 +60,7 @@ func (storage *Storage) GetClientToken() string {
 }
 
 func (storage *Storage) SaveClientToken(token string) {
+	storage.load()
 	storage.innerStore.ClientToken = token
 	storage.save()
 }
@@ -71,16 +76,35 @@ func (storage *Storage) GetNextFeedID() int {
 }
 
 func (storage *Storage) SaveNewFeed(url string) *Feed {
+	storage.load()
 	var newID = storage.GetNextFeedID()
-	storage.Logger.Println("Before Save")
 	if storage.innerStore.Feeds == nil {
 		storage.innerStore.Feeds = make(map[int]*Feed)
 		storage.save()
 	}
 	storage.innerStore.Feeds[newID] = &Feed{Url: url, id: newID, ItemUrls: make(map[string]bool)}
-	storage.Logger.Println("Saved")
+	storage.Logger.Printf("Saved New Feed: %s", url)
 	storage.save()
 	return storage.innerStore.Feeds[newID]
+}
+
+func (storage *Storage) GetFeedByID(id int) *Feed {
+	storage.load()
+	if storage.innerStore.Feeds == nil {
+		return nil
+	}
+
+	return storage.innerStore.Feeds[id]
+}
+
+func (storage *Storage) RemoveFeedByID(id int) {
+	storage.load()
+	if storage.innerStore.Feeds == nil || storage.innerStore.Feeds[id] == nil {
+		return
+	}
+	storage.Logger.Printf("Deleted Feed: %s", storage.innerStore.Feeds[id].Url)
+	delete(storage.innerStore.Feeds, id)
+	storage.save()
 }
 
 func (storage *Storage) GetFeeds() *map[int]*Feed {

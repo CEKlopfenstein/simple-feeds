@@ -14,7 +14,7 @@ import (
 type RSS_Reader struct {
 	listener  *websocket.Conn
 	gotifyApi gotify_api.GotifyApi
-	storage   storage.Storage
+	Storage   storage.Storage
 	userName  string
 	logger    *log.Logger
 }
@@ -28,7 +28,7 @@ func (rssreader *RSS_Reader) SetUserName(userName string) {
 }
 
 func (rssreader *RSS_Reader) SetStorage(storage storage.Storage) {
-	rssreader.storage = storage
+	rssreader.Storage = storage
 }
 
 func (rssreader *RSS_Reader) SetLogger(logger *log.Logger) {
@@ -39,7 +39,7 @@ func (rssreader *RSS_Reader) GetGotifyApi() gotify_api.GotifyApi {
 }
 
 func (rssreader *RSS_Reader) UpdateToken(token string) error {
-	rssreader.storage.SaveClientToken(token)
+	rssreader.Storage.SaveClientToken(token)
 	err := rssreader.gotifyApi.UpdateToken(token)
 	if err != nil {
 		return err
@@ -48,10 +48,14 @@ func (rssreader *RSS_Reader) UpdateToken(token string) error {
 }
 
 func (rssreader *RSS_Reader) CheckFeeds(msgHandler plugin.MessageHandler) {
-	var feeds = rssreader.storage.GetFeeds()
+	var feeds = rssreader.Storage.GetFeeds()
 	for id, feedRecord := range *feeds {
 		fp := gofeed.NewParser()
 		feed, _ := fp.ParseURL(feedRecord.Url)
+		if feed == nil {
+			rssreader.Storage.Logger.Printf("Failed to parse: %s", feedRecord.Url)
+			continue
+		}
 		var latest *time.Time = nil
 		var urls = []string{}
 		for itemIndex := len(feed.Items) - 1; itemIndex >= 0; itemIndex-- {
@@ -67,12 +71,12 @@ func (rssreader *RSS_Reader) CheckFeeds(msgHandler plugin.MessageHandler) {
 				latest = timeOfPost
 			}
 
-			if feedRecord.IsItemNew(item, &rssreader.storage) {
+			if feedRecord.IsItemNew(item, &rssreader.Storage) {
 				rssreader.sendRSSMessage(msgHandler, *item)
 			}
 		}
 
-		rssreader.storage.SaveITemUrlsAndLatestDate(id, urls, latest)
+		rssreader.Storage.SaveITemUrlsAndLatestDate(id, urls, latest)
 	}
 
 }

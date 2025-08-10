@@ -1,0 +1,10 @@
+<div class="bg-card p-3 rounded shadow m-3 w-100">
+    {{if .Title}}
+    <h2>{{.Title}}</h2>
+    {{.Body}}
+    {{else if .Body}}
+    {{.Body}}
+    {{else}}
+    No Body or Title Provided for card
+    {{end}}
+</div>

@@ -2,22 +2,22 @@
 
 [![Release Pipeline](https://github.com/CEKlopfenstein/simple-feeds/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/CEKlopfenstein/simple-feeds/actions/workflows/release.yml)
 
-Simple Gotify Plugin that periodically queries different feeds and publishes new feed items to the attached Gotify Server
+A simple Gotify Plugin that periodically queries different feeds and publishes new feed items to the attached Gotify Server.
 
 ## Features
 - Graphical User Interface
-    - Allows the mangement of feeds (Add/Delete)
+   - Allows the management of feeds (Add/Delete)
 - Support for multiple feed types
-    - Support of multiple feed types is achived through [gofeed](https://github.com/mmcdole/gofeed) library.
+   - Support of multiple feed types is achieved through [gofeed](https://github.com/mmcdole/gofeed) library.
 - Able to determine whether feed items are "new" through different means.
-    - If the feed in question does not provide a timestamp for when posts are made this plugin will fall back onto attempting to use the URL of the feed item in question to determine "newness".
+   - If the feed in question does not provide a timestamp for when posts are made, this plugin will fall back on attempting to use the URL of the feed item in question to determine "newness".
 
 ## Motivation
-I previously was using a Chrome plugin called RSS Feed Reader to watch RSS feeds. But I tend to miss the emails it sends out. And wanted to be able to place the updates of the feeds into a Discord Server. Which I can using this plugin and my [Gotify Relay](https://github.com/CEKlopfenstein/gotify-repeater) plugin.
+I previously was using a Chrome plugin called RSS Feed Reader to watch RSS feeds. But I tend to miss the emails it sends out. I wanted to be able to place the updates of the feeds into a Discord Server. Which can be done using this plugin and my [Gotify Relay](https://github.com/CEKlopfenstein/gotify-repeater) plugin.
 
 ## Currently Planned Features
-- Add the ability to have seperate Gotify "Apps" for seperate feeds.
-    - Currently all feeds go into a single app for the plugin itself.
+- Add the ability to have separate Gotify "Apps" for separate feeds.
+   - Currently, all feeds go into a single app for the plugin itself.
 
 ## [Changelog](/CHANGELOG.md)
 

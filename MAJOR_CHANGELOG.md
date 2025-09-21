@@ -1,1 +1,1 @@
-- Version Bump for Gotify 2.7.2
+- Version Bump for Gotify 2.7.3

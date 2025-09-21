@@ -1,3 +1,6 @@
+## 2025.09.21
+- Version Bump for Gotify 2.7.3
+
 ## 2025.09.13
 - Version Bump for Gotify 2.7.2
 

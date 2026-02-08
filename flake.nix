@@ -22,8 +22,13 @@
           ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           ];
         })
+        # Golang
         pkgs.go
+        # Go Language Server
+        pkgs.gopls
+        # Used to get gotify server version
         pkgs.wget
+        # To enable makefiles.
         pkgs.gnumake
       ];
 

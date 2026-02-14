@@ -1,5 +1,5 @@
 BUILDDIR=./build
-GOTIFY_VERSION=v2.8.0
+GOTIFY_VERSION=v2.9.0
 PLUGIN_NAME=simple-feeds
 PLUGIN_ENTRY=plugin.go
 GO_VERSION=`cat $(BUILDDIR)/gotify-server-go-version`
@@ -14,6 +14,7 @@ TEST_SERVER_PLUGINS=./test-server/plugins
 all: build-linux-amd64
 
 run: build-linux-amd64 ${BUILDDIR}/${PLUGIN_NAME}-linux-amd64${FILE_SUFFIX}.so
+	mkdir -p ${TEST_SERVER_PLUGINS}
 	sudo mv ${BUILDDIR}/${PLUGIN_NAME}-linux-amd64${FILE_SUFFIX}.so ${TEST_SERVER_PLUGINS}/${PLUGIN_NAME}-linux-amd64${FILE_SUFFIX}.so
 	sudo docker compose up --build
 	echo "Ran"

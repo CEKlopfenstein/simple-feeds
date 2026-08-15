@@ -1,3 +1,8 @@
+## 2026.08.15
+- Update build version to Gotify 3,0.0
+- Changed method of aquiring client token from using LocalStorage to use the value found in the Cookie.
+- API usage now uses cookie rather than header.
+- Removed Wrapper HTML due to no longer needing to pull value from LocalStorage.
 ## 2026.05.04
 - Version Bump for Gotify 2.9.1
 

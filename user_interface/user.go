@@ -2,7 +2,9 @@ package user_interface
 
 import (
 	"bytes"
+	"crypto/sha256"
 	_ "embed"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"log"
@@ -34,9 +36,6 @@ var newFeedCardBody string
 
 //go:embed cards/blank-card-wrapper.html
 var blankCardWrapper string
-
-//go:embed wrapper.html
-var wrapper string
 
 //go:embed htmx.min.js
 var htmxMinJS string
@@ -73,19 +72,14 @@ func BuildInterface(basePath string, mux *gin.RouterGroup, rss *rssreader.RSS_Re
 
 	var generalInfoCard = card{Body: template.HTML(generalInfoCardBody)}
 	cards = append(cards, generalInfoCard)
+	var feedsCard = card{Body: template.HTML("<span hx-get='feeds' hx-trigger='load' hx-target='closest div' hx-swap='outerHTML'></span>")}
+	cards = append(cards, feedsCard)
+	var newFeedCard = card{Title: "Create Feed", Body: template.HTML(newFeedCardBody)}
+	cards = append(cards, newFeedCard)
 	var loggerCard = card{Body: template.HTML(loggerCardBody)}
 	cards = append(cards, loggerCard)
-	var feedsCard = card{Body: template.HTML("<span hx-get='feeds' hx-trigger='load' hx-target='closest div' hx-swap='outerHTML'></span>")}
-	var newFeedCard = card{Title: "Create Feed", Body: template.HTML(newFeedCardBody)}
 
 	var pageData = userPage{HtmxBasePath: "htmx.min.js", Cards: cards, MainJSPath: "main.js", Bootstrap: "bootstrap.min.css"}
-
-	wrapperTemplate, wrapperTemplateParseError := template.New("").Parse(wrapper)
-	if wrapperTemplateParseError != nil {
-		logger.Println("Failed to parse Wrapper Template")
-		logger.Println(wrapperTemplateParseError.Error())
-		return
-	}
 
 	feedCardTemplate, feedCardParseError := template.New("").Parse(feedCardBody)
 	if feedCardParseError != nil {
@@ -112,20 +106,16 @@ func BuildInterface(basePath string, mux *gin.RouterGroup, rss *rssreader.RSS_Re
 	})
 
 	mux.GET("/", func(ctx *gin.Context) {
-		var clientKey = ctx.Request.Header.Get("X-Gotify-Key")
-		if len(clientKey) == 0 {
+		cookie, cookieError := ctx.Request.Cookie("gotify-client-token")
+		var clientKey = cookie.Value
 
-			var cards = []card{}
-			cards = append(cards, generalInfoCard)
-			cards = append(cards, feedsCard)
-			cards = append(cards, newFeedCard)
-			cards = append(cards, loggerCard)
-			pageData.Cards = cards
-
-			err := wrapperTemplate.Execute(ctx.Writer, pageData)
-			if err != nil {
-				logger.Println(err)
-			}
+		if cookieError != nil {
+			logger.Println(cookieError)
+			ctx.Data(http.StatusUnauthorized, "text/html", []byte("Failed to parse/get gotify-client-token Cookie"))
+			ctx.Done()
+		} else if len(clientKey) == 0 {
+			logger.Println("gotify-client-token Cookie Missing")
+			ctx.Data(http.StatusUnauthorized, "text/html", []byte("gotify-client-token Cookie Missing"))
 			ctx.Done()
 		} else {
 			var server = rss.GetGotifyApi()
@@ -152,9 +142,10 @@ func BuildInterface(basePath string, mux *gin.RouterGroup, rss *rssreader.RSS_Re
 
 	internalGotifyApi := gotify_api.SetupGotifyApi(hostname, "")
 	mux.Use(func(ctx *gin.Context) {
-		var clientKey = ctx.Request.Header.Get("X-Gotify-Key")
+		cookie, _ := ctx.Request.Cookie("gotify-client-token")
+		var clientKey = cookie.Value
 		if len(clientKey) == 0 {
-			ctx.Data(http.StatusUnauthorized, "text/html", []byte("X-Gotify-Key Missing"))
+			ctx.Data(http.StatusUnauthorized, "text/html", []byte("gotify-client-token Missing"))
 			ctx.Done()
 			return
 		}
@@ -200,11 +191,16 @@ func BuildInterface(basePath string, mux *gin.RouterGroup, rss *rssreader.RSS_Re
 		var token = ctx.PostForm("token")
 
 		if token == "new" {
-			currentToken := rss.Storage.GetClientToken()
-			if internalGotifyApi.CheckToken(currentToken) == nil {
-				client := internalGotifyApi.FindClientFromToken(currentToken)
-				if len(client.Token) != 0 && client.Token != headerToken && client.Name == "RSS Client" {
-					internalGotifyApi.DeleteClient(client.Id)
+			clientToken := rss.Storage.GetClientToken()
+			h := sha256.New()
+			h.Write([]byte(clientToken))
+			expectedClientName := "RSS Client " + base64.StdEncoding.EncodeToString([]byte(h.Sum(nil)))[:16]
+			if internalGotifyApi.CheckToken(clientToken) == nil {
+				client := internalGotifyApi.FindClientFromName(expectedClientName)
+				logger.Println(client.Name)
+				if len(client.Name) != 0 {
+					// Round about method of "deleting" old clients. (Gotify may be updated later causing this to fail.)
+					internalGotifyApi.UpdateClient(client.Id, "Old RSS Client: Will Delete In 10 Seconds", 10)
 				}
 			}
 			newClient, err := internalGotifyApi.CreateClient("RSS Client")
@@ -214,6 +210,18 @@ func BuildInterface(basePath string, mux *gin.RouterGroup, rss *rssreader.RSS_Re
 				return
 			}
 			token = newClient.Token
+
+			h.Reset()
+			h.Write([]byte(token))
+
+			newClient, _ = internalGotifyApi.UpdateClient(newClient.Id, "RSS Client "+base64.StdEncoding.EncodeToString([]byte(h.Sum(nil)))[:16], 0)
+			currentToken := rss.Storage.GetClientToken()
+			if internalGotifyApi.CheckToken(currentToken) == nil {
+				client := internalGotifyApi.FindClientFromToken(currentToken)
+				if len(client.Token) != 0 && client.Token != headerToken && client.Name == "RSS Client" {
+					internalGotifyApi.DeleteClient(client.Id)
+				}
+			}
 		}
 
 		rss.UpdateToken(token)

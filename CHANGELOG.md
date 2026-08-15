@@ -3,6 +3,9 @@
 - Changed method of aquiring client token from using LocalStorage to use the value found in the Cookie.
 - API usage now uses cookie rather than header.
 - Removed Wrapper HTML due to no longer needing to pull value from LocalStorage.
+- Clients are now named with "unique" names for selection purposes.
+- Clients are no longer deleted. Instead they are renamed and have an experation applied. Clients in the future may have a inactivity timer set rather than being removed in this way.
+
 ## 2026.05.04
 - Version Bump for Gotify 2.9.1
 

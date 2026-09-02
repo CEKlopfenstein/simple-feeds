@@ -1,5 +1,5 @@
 BUILDDIR=./build
-GOTIFY_VERSION=v3.0.0
+GOTIFY_VERSION=v3.1.0
 PLUGIN_NAME=simple-feeds
 PLUGIN_ENTRY=plugin.go
 GO_VERSION=`cat $(BUILDDIR)/gotify-server-go-version`

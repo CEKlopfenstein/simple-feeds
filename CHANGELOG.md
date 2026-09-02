@@ -1,3 +1,6 @@
+## 2026.09.02
+- Version Bump for Gotify 3.1.0
+
 ## 2026.08.15
 - Update build version to Gotify 3,0.0
 - Changed method of aquiring client token from using LocalStorage to use the value found in the Cookie.
